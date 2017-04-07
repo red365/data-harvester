@@ -3,20 +3,25 @@ import datetime
 import urllib
 from football_utils import get_json
 
-def table_harvester():
-    i = 1
-    for i in range (3):
-        table_all = open('/home/rob/Scripts/python/data-harvester/data/tables/comp-' + str(i) + '-' + str(datetime.date.today()) + '.json', 'w')
-        page = get_json("http://www.footballwebpages.co.uk/league.json?comp=" + str(i) + "&showHa=yes" )
-        page = str(page)
-        table_all.write(page)
-        table_all.close
-#        table_home = open('/home/rob/Scripts/python/data-harvester/data/tables/comp-' + str(i) + '-' + str(datetime.date.today()) + '.json', 'w')
-#        table_home.write(get_json("http://www.footballwebpages.co.uk/league.json?comp=" + str(i) + "&sort=home&showHa=no" ))
-#        table_home.close
-#        table_away = open('/home/rob/Scripts/python/data-harvester/data/tables/comp-' + str(i) + '-' + str(datetime.date.today()) + '.json', 'w')
-#        table_away.write(get_json("http://www.footballwebpages.co.uk/league.json?comp=" + str(i) + "&sort=away&showHa=no" ))
-#        table_away.close
+def store_data(comp_id, directory, table_name, table_type, show_ha):
+    
+    table = open('/home/rob/Scripts/python/data-harvester/data/' + directory + '/comp-' + str(comp_id) + '-' + str(datetime.date.today()) + '-' + table_name + '.json', 'w')
+    if directory == "tables":
+        table.write(str(get_json("http://www.footballwebpages.co.uk/league.json?comp=" + str(comp_id) + "&sort=" + table_type + "&showHa=" + show_ha + "" )))
+    else:
+        table.write(str(get_json("http://www.footballwebpages.co.uk/form.json?comp=" + str(comp_id) + "&type=" + table_name + "" )))
+    table.close
 
-table_harvester()
+def data_harvester():
+    for i in range(21):
+        if i == 0:
+            i += 1
+        store_data(i, "tables", "ALL", "normal", "yes")
+        store_data(i, "tables", "HOME", "home", "no")
+        store_data(i, "tables", "AWAY", "away", "no")
+        store_data(i, "form", "all", "...", "...")
+        store_data(i, "form", "home", "...", "...")
+        store_data(i, "form", "away", "...", "...")
+                
+data_harvester()
 print "done"
